@@ -1,0 +1,30 @@
+// insecure.js
+
+// SAST Issue 1: SQL Injection vulnerability
+const mysql = require('mysql');
+
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'testdb'
+});
+
+function getUserInfo(userId) {
+  // Issue: userId is inserted directly into the SQL query without sanitization
+  const query = `SELECT * FROM users WHERE id = ${userId}`;
+  connection.query(query, function(err, results) {
+    if (err) throw err;
+    console.log(results);
+  });
+}
+
+// SAST Issue 2: Insecure use of eval() (code injection vulnerability)
+function executeUserCode(userCode) {
+  // Issue: userCode is passed directly into eval() without validation, leading to potential code execution
+  eval(userCode);
+}
+
+// Example usage
+getUserInfo("1 OR 1=1");  // Example of SQL Injection attack
+executeUserCode("console.log('Hacked!')");  // Example of code injection
